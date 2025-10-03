@@ -20,13 +20,12 @@ class Config:
         self.project_key_name = 'HydrographyProject'
 
         # Directories
-        self.data_ = os.path.join(os.getcwd(), 'data')
         self.warehouse = os.path.join(os.getcwd(), 'warehouse')
+        self.distributions_ = os.path.join(self.warehouse, 'distributions')
+        self.maps_ = os.path.join(self.distributions_, 'maps')
 
-        self.latest_ = os.path.join(self.warehouse, 'latest')
-        self.points_ = os.path.join(self.latest_, 'points')
-        self.menu_ = os.path.join(self.latest_, 'menu')
-        self.maps_ = os.path.join(self.latest_, 'maps')
+        # Prefix
+        self.prefix = self.distributions_.replace(os.getcwd() + os.sep, '')
 
         # The model assets section
         self.origin_ = 'assets/latest'
@@ -34,7 +33,4 @@ class Config:
         # Keys, etc
         self.s3_parameters_key = 's3_parameters.yaml'
         self.argument_key = 'artefacts/architecture/latest/arguments.json'
-        self.metadata_ = 'events/external'
-
-        # Prefix
-        self.prefix = 'warehouse' + '/' + 'latest'
+        self.metadata_ = 'distributions/external'
