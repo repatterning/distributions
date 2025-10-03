@@ -8,7 +8,7 @@ Develop<br>
 
 <br>
 
-**Events**
+**Distributions**
 
 <br>
 <br>
