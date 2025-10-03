@@ -1,5 +1,4 @@
 """Module interface.py"""
-import typing
 import sys
 
 import pandas as pd
