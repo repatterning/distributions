@@ -5,7 +5,6 @@ import os
 import sys
 
 import boto3
-import numpy as np
 
 
 def main():
@@ -23,14 +22,11 @@ def main():
     logger.info('Starting: %s', datetime.datetime.now().isoformat(timespec='microseconds'))
 
     # Assets
-    src.assets.Assets(s3_parameters=s3_parameters).exc()
-    specifications_ = src.data.interface.Interface(s3_parameters=s3_parameters).exc()
-    members = np.unique(np.array([c.catchment_id for c in specifications_])).tolist()
+    assets = src.assets.interface.Interface(
+        service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
+    members = assets['catchment_id'].unique().tolist()
 
-    # Evaluating predictions
-    src.predictions.interface.Interface(arguments=arguments).exc(specifications_=specifications_)
-
-    # Risks
+    # Distributions
     src.cartography.interface.Interface(
         service=service, s3_parameters=s3_parameters, connector=connector).exc(members=members)
 
@@ -55,13 +51,11 @@ if __name__ == '__main__':
                         datefmt='%Y-%m-%d %H:%M:%S')
 
     # Modules
-    import src.assets
     import src.cartography.interface
-    import src.data.interface
+    import src.assets.interface
     import src.elements.service as sr
     import src.elements.s3_parameters as s3p
     import src.functions.cache
-    import src.predictions.interface
     import src.preface.interface
     import src.transfer.interface
 
