@@ -41,7 +41,13 @@ class Foci:
         :return:
         """
 
-        conditionals = warnings['ending'] >= self.__stamp
+        instances = warnings[['issued_date', 'warning_id']].drop_duplicates()
+        instances.sort_values(by='issued_date', ascending=True, inplace=True)
+        elements = instances.iloc[-1, :].squeeze()
+        logging.info('%s: %s', elements.warning_id, elements.issued_date)
+
+        conditionals = ((warnings['warning_id'] == elements.warning_id) &
+                        (warnings['ending'] >= self.__stamp))
 
         return warnings.copy().loc[conditionals, :]
 
