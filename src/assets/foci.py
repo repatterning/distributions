@@ -85,7 +85,4 @@ class Foci:
             src.functions.cache.Cache().exc()
             sys.exit(0)
 
-        if sum(warnings['warning_level'].str.upper() == 'AMBER') > 0:
-            warnings = warnings.copy().loc[warnings['warning_level'].str.upper() == 'AMBER', :]
-
         return warnings[['catchment_id', 'ts_id']].drop_duplicates()
