@@ -2,6 +2,7 @@
 import pathlib
 
 import boto3
+import pandas as pd
 import geopandas
 
 import src.cartography.data
@@ -35,10 +36,10 @@ class Interface:
         # Instances
         self.__maps = src.cartography.maps.Maps(connector=self.__connector, s3_parameters=self.__s3_parameters)
 
-    def exc(self, members: list[int]):
+    def exc(self, assets: pd.DataFrame):
         """
 
-        :param members:
+        :param assets:
         :return:
         """
 
@@ -52,4 +53,4 @@ class Interface:
 
         # Draw
         src.cartography.illustrate.Illustrate(
-            data=data, coarse=coarse, members=members).exc(_name='assets')
+            data=data, coarse=coarse, assets=assets).exc(_name='assets')
