@@ -88,9 +88,7 @@ class Illustrate:
                 function(feature, layer) {
                     layer.bindTooltip(
                         '<b>' + feature.properties.station_name + '</b><br>' +
-                        'Latest: ' + feature.properties.latest.toFixed(4) + ' mm/hr<br>' +
-                        'Median: ' + feature.properties.median.toFixed(4) + ' mm/hr<br>' +
-                        'Maximum: ' + feature.properties.maximum.toFixed(4) + ' mm/hr<br>' +
+                        'Gauge Datum: ' + feature.properties.gauge_datum.toFixed(4) + ' metres<br>' +
                         'River/Water: ' + feature.properties.river_name + '<br>' +
                         'Catchment: ' + feature.properties.catchment_name + '<br>As of: ' + feature.properties.ending_str
                     );}""")
@@ -101,8 +99,8 @@ class Illustrate:
                 marker=folium.CircleMarker(
                     radius=22.5, stroke=False, fill=True, fillColor=colours(parcel.decimal), fillOpacity=0.65),
                 style_function=lambda feature: {
-                    "fillOpacity": custom.f_opacity(feature['properties']['latest']),
-                    "radius": custom.f_radius(feature['properties']['latest'])
+                    "fillOpacity": custom.f_opacity(feature['properties']['gauge_datum']),
+                    "radius": custom.f_radius(feature['properties']['gauge_datum'])
                 },
                 zoom_on_click=True,
                 on_each_feature=on_each_feature
