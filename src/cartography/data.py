@@ -1,4 +1,5 @@
 """Module cartography/data.py"""
+import logging
 import geopandas
 import pandas as pd
 
@@ -8,44 +9,60 @@ class Data:
     Data
     """
 
-    def __init__(self, care: geopandas.GeoDataFrame):
+    def __init__(self, care: geopandas.GeoDataFrame, reference: geopandas.GeoDataFrame):
         """
 
         :param care: Care home frame
+        :param reference: Of gauges
         """
 
-        self.__care = self.__get_care(care=care.copy())
+        self.__care = care
+        self.__reference = reference
 
         # fields
         self.__f_care = ['catchment_id', 'catchment_name', 'focus', 'latitude', 'longitude', 'organisation',
                          'town', 'local_authority', 'geometry']
-        self.__f_risks = ['catchment_id', 'catchment_name', 'focus', 'latitude', 'longitude', 'station_name',
-                          'latest', 'maximum', 'minimum', 'median', 'ending', 'ending_str', 'river_name', 'geometry']
+        self.__f_reference = ['catchment_id', 'catchment_name', 'focus', 'station_id', 'latitude', 'longitude',
+                              'station_name', 'ts_name', 'river_name', 'gauge_datum', 'geometry']
 
-    @staticmethod
-    def __get_care(care: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
+    def __get_care(self) -> geopandas.GeoDataFrame:
         """
 
-        :param care: Care home frame
         :return:
         """
+
+        care = self.__care.copy()
 
         care['latitude'] = care.geometry.apply(lambda k: k.y)
         care['longitude'] = care.geometry.apply(lambda k: k.x)
         care['focus'] = 'elders'
 
-        return care
+        return care[self.__f_care]
 
-    def exc(self, risks: geopandas.GeoDataFrame) -> geopandas.GeoDataFrame:
+    def __get_reference(self) -> geopandas.GeoDataFrame:
         """
 
-        :param risks: A frame of river level change rates, etc.
         :return:
         """
 
-        risks['focus'] = 'gauge'
+        reference = self.__reference.copy()
+        reference['focus'] = 'gauge'
+
+        return reference[self.__f_reference]
+
+    def exc(self) -> geopandas.GeoDataFrame:
+        """
+
+        :return:
+        """
+
+        care = self.__get_care()
+        logging.info(care)
+
+        reference = self.__get_reference()
+        logging.info(reference)
 
         # Concatenating
-        data = pd.concat([self.__care[self.__f_care], risks[self.__f_risks]], axis=0, ignore_index=True)
+        data = pd.concat([care, reference], axis=0, ignore_index=True)
 
         return data
