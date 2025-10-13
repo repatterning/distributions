@@ -5,8 +5,8 @@ import branca.colormap
 import folium
 import folium.plugins
 import folium.utilities
-import pandas as pd
 import geopandas
+import pandas as pd
 
 import config
 import src.cartography.centroids
@@ -111,7 +111,7 @@ class Illustrate:
             for i in range(leaves.shape[0]):
                 folium.Marker(
                     location=[leaves.iloc[i]['latitude'], leaves.iloc[i]['longitude']],
-                    popup=leaves.iloc[i]['organisation'],
+                    popup=leaves.iloc[i]['organisation'] + ', ' + leaves.iloc[i]['town'],
                     icon=folium.Icon(prefix='fa', icon='house-flag', icon_size=(0.5,0.5), color='white', icon_color='black')
                 ).add_to(vector)
 
