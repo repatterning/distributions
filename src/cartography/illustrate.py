@@ -5,6 +5,7 @@ import branca.colormap
 import folium
 import folium.plugins
 import folium.utilities
+import pandas as pd
 import geopandas
 
 import config
@@ -19,12 +20,12 @@ class Illustrate:
     Illustrate
     """
 
-    def __init__(self, data: geopandas.GeoDataFrame, coarse: geopandas.GeoDataFrame, members: list[int]):
+    def __init__(self, data: geopandas.GeoDataFrame, coarse: geopandas.GeoDataFrame, assets: pd.DataFrame):
         """
 
         :param data: A frame of metrics per gauge station, and of care homes.
         :param coarse: The boundaries of the hydrometric catchments
-        :param members: The codes of the catchments that intersect with warning areas
+        :param assets: The assets ...
         """
 
         self.__data = data
@@ -35,7 +36,7 @@ class Illustrate:
 
         # Centroid, Parcels
         self.__c_latitude, self.__c_longitude = src.cartography.centroids.Centroids(blob=self.__data).__call__()
-        self.__parcels: list[pcl.Parcel] = src.cartography.parcels.Parcels(data=self.__data).exc(members=members)
+        self.__parcels: list[pcl.Parcel] = src.cartography.parcels.Parcels(data=self.__data, assets=assets).exc()
 
     # pylint: disable=R0915
     def exc(self, _name: str):
@@ -72,7 +73,7 @@ class Illustrate:
         computations = []
         for parcel in self.__parcels:
 
-            show = parcel.warning
+            show = parcel.visible
             vector = folium.FeatureGroup(name=parcel.catchment_name, show=show)
 
             # gauges, care homes
