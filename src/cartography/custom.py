@@ -21,8 +21,8 @@ class Custom:
         :return:
         """
 
-        minimum = 13.5
-        maximum = 22.5
+        minimum = 6.5
+        maximum = 11.5
 
         return minimum + (maximum - minimum)*value/(1 + np.abs(value))
 
