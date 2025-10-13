@@ -12,9 +12,6 @@ def main():
     Entry Point<br>
     -----------<br>
 
-    Example:
-        members = [277152, 277157, 277164, 277165, 277169, 277171, 277181, 277186]<br>
-
     :return:
     """
 
@@ -24,11 +21,10 @@ def main():
     # Assets
     assets = src.assets.interface.Interface(
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
-    members = assets['catchment_id'].unique().tolist()
 
     # Distributions
     src.cartography.interface.Interface(
-        service=service, s3_parameters=s3_parameters, connector=connector).exc(members=members)
+        service=service, s3_parameters=s3_parameters, connector=connector).exc(assets=assets)
 
     # Transfer
     src.transfer.interface.Interface(

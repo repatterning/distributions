@@ -1,4 +1,4 @@
-name: 'Hydrography: Risks & Warning Areas'
+name: 'Hydrography: Mapping the distribution of assets of import'
 
 on: [push]
 

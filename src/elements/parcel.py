@@ -14,11 +14,11 @@ class Parcel(typing.NamedTuple):
         The corresponding catchment name.<br><br>
     <b>decimal</b>: float<br>
         A decimal number for colour coding.<br><br>
-    <b>warning</b>: bool<br>
-        Included in the latest warning?
+    <b>visible</b>: bool<br>
+        Visible?
     """
 
     catchment_id: int
     catchment_name: str
     decimal: float
-    warning: bool
+    visible: bool

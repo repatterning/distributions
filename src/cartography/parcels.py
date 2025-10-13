@@ -11,16 +11,19 @@ class Parcels:
     Parcels
     """
 
-    def __init__(self, data: geopandas.GeoDataFrame):
+    def __init__(self, data: geopandas.GeoDataFrame, assets: pd.DataFrame):
         """
 
         :param data: The frame of metrics per gauge station.
+        :param assets: The assets ...
         """
 
         self.__data = data
+        self.__assets = assets
 
         # Seed
         self.__seed = 5
+        self.__rng = np.random.default_rng(seed=self.__seed)
 
     def __get_decimals(self, size: int):
         """
@@ -29,9 +32,7 @@ class Parcels:
         :return:
         """
 
-        rng = np.random.default_rng(seed=self.__seed)
-
-        return rng.uniform(low=0.05, high=0.80, size=size)
+        return self.__rng.uniform(low=0.05, high=0.80, size=size)
 
     def __catchments(self) -> pd.DataFrame:
         """
@@ -40,6 +41,7 @@ class Parcels:
         """
 
         frame = self.__data[['catchment_id', 'catchment_name']].drop_duplicates()
+        frame = frame.copy().loc[frame['catchment_id'].isin(self.__assets['catchment_id'].unique()), :]
 
         # Hence
         frame.sort_values(by='catchment_name', inplace=True)
@@ -47,16 +49,29 @@ class Parcels:
 
         return frame
 
-    def exc(self, members: list) -> list[pcl.Parcel]:
+    def __visible(self, data: pd.DataFrame):
         """
 
-        :param members:
+        :param data:
+        :return:
+        """
+
+
+        indices = self.__rng.choice(np.arange(data.shape[0]), size=5, replace=False)
+        sequence = np.arange(data.shape[0])
+
+        return data.assign(
+            visible=np.isin(sequence, indices))
+
+    def exc(self) -> list[pcl.Parcel]:
+        """
+
         :return:
         """
 
         catchments = self.__catchments()
         catchments['decimal'] = self.__get_decimals(size=catchments.shape[0])
-        catchments['warning'] = catchments['catchment_id'].isin(members).values
+        catchments = self.__visible(data=catchments.copy())
 
         # An iterable for mapping by layer
         values: list[dict] = catchments.to_dict(orient='records')

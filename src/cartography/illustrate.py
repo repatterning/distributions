@@ -6,6 +6,7 @@ import folium
 import folium.plugins
 import folium.utilities
 import geopandas
+import pandas as pd
 
 import config
 import src.cartography.centroids
@@ -19,12 +20,12 @@ class Illustrate:
     Illustrate
     """
 
-    def __init__(self, data: geopandas.GeoDataFrame, coarse: geopandas.GeoDataFrame, members: list[int]):
+    def __init__(self, data: geopandas.GeoDataFrame, coarse: geopandas.GeoDataFrame, assets: pd.DataFrame):
         """
 
         :param data: A frame of metrics per gauge station, and of care homes.
         :param coarse: The boundaries of the hydrometric catchments
-        :param members: The codes of the catchments that intersect with warning areas
+        :param assets: The assets ...
         """
 
         self.__data = data
@@ -35,7 +36,7 @@ class Illustrate:
 
         # Centroid, Parcels
         self.__c_latitude, self.__c_longitude = src.cartography.centroids.Centroids(blob=self.__data).__call__()
-        self.__parcels: list[pcl.Parcel] = src.cartography.parcels.Parcels(data=self.__data).exc(members=members)
+        self.__parcels: list[pcl.Parcel] = src.cartography.parcels.Parcels(data=self.__data, assets=assets).exc()
 
     # pylint: disable=R0915
     def exc(self, _name: str):
@@ -72,7 +73,7 @@ class Illustrate:
         computations = []
         for parcel in self.__parcels:
 
-            show = parcel.warning
+            show = parcel.visible
             vector = folium.FeatureGroup(name=parcel.catchment_name, show=show)
 
             # gauges, care homes
@@ -88,11 +89,9 @@ class Illustrate:
                 function(feature, layer) {
                     layer.bindTooltip(
                         '<b>' + feature.properties.station_name + '</b><br>' +
-                        'Latest: ' + feature.properties.latest.toFixed(4) + ' mm/hr<br>' +
-                        'Median: ' + feature.properties.median.toFixed(4) + ' mm/hr<br>' +
-                        'Maximum: ' + feature.properties.maximum.toFixed(4) + ' mm/hr<br>' +
+                        'Gauge Datum: ' + feature.properties.gauge_datum.toFixed(4) + ' metres<br>' +
                         'River/Water: ' + feature.properties.river_name + '<br>' +
-                        'Catchment: ' + feature.properties.catchment_name + '<br>As of: ' + feature.properties.ending_str
+                        'Catchment: ' + feature.properties.catchment_name + '<br>'
                     );}""")
 
             folium.GeoJson(
@@ -101,8 +100,8 @@ class Illustrate:
                 marker=folium.CircleMarker(
                     radius=22.5, stroke=False, fill=True, fillColor=colours(parcel.decimal), fillOpacity=0.65),
                 style_function=lambda feature: {
-                    "fillOpacity": custom.f_opacity(feature['properties']['latest']),
-                    "radius": custom.f_radius(feature['properties']['latest'])
+                    "fillOpacity": custom.f_opacity(feature['properties']['gauge_datum']),
+                    "radius": custom.f_radius(feature['properties']['gauge_datum'])
                 },
                 zoom_on_click=True,
                 on_each_feature=on_each_feature
@@ -112,7 +111,7 @@ class Illustrate:
             for i in range(leaves.shape[0]):
                 folium.Marker(
                     location=[leaves.iloc[i]['latitude'], leaves.iloc[i]['longitude']],
-                    popup=leaves.iloc[i]['organisation'],
+                    popup=leaves.iloc[i]['organisation'] + ', ' + leaves.iloc[i]['town'],
                     icon=folium.Icon(prefix='fa', icon='house-flag', icon_size=(0.5,0.5), color='white', icon_color='black')
                 ).add_to(vector)
 
