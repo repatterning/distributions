@@ -8,7 +8,6 @@ import src.cartography.data
 import src.cartography.illustrate
 import src.cartography.maps
 import src.cartography.reference
-import src.cartography.risks
 import src.elements.s3_parameters as s3p
 import src.s3.keys
 
