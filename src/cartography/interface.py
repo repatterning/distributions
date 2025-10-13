@@ -11,6 +11,7 @@ import src.elements.s3_parameters as s3p
 import src.elements.service as sr
 import src.s3.keys
 import src.cartography.illustrate
+import src.cartography.reference
 
 
 class Interface:
@@ -44,24 +45,11 @@ class Interface:
         # Maps
         coarse = self.__maps.exc(key_name='cartography/coarse.geojson')
         care = self.__maps.exc(key_name='cartography/care_and_coarse_catchments.geojson')
+        reference = src.cartography.reference.Reference(s3_parameters=self.__s3_parameters).exc()
 
-        # The list of rate files
-        elements = src.s3.keys.Keys(service=self.__service, bucket_name=self.__s3_parameters.external).excerpt(
-            prefix='warehouse/risks/points/', delimiter='')
+        # Building
+        data: geopandas.GeoDataFrame = src.cartography.data.Data(care=care, reference=reference).exc()
 
-        # Per rate risk file
-        __data = src.cartography.data.Data(care=care)
-        for key_name in elements:
-
-            _name = pathlib.Path(key_name).stem
-
-            # Get river level weighted rate of change ...
-            risks: geopandas.GeoDataFrame = src.cartography.risks.Risks(
-                s3_parameters=self.__s3_parameters, connector=self.__connector, key_name=key_name).exc()
-
-            # Build
-            data: geopandas.GeoDataFrame = __data.exc(risks=risks)
-
-            # Draw
-            src.cartography.illustrate.Illustrate(
-                data=data, coarse=coarse, members=members).exc(_name=_name)
+        # Draw
+        src.cartography.illustrate.Illustrate(
+            data=data, coarse=coarse, members=members).exc(_name='assets')
