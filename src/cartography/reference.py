@@ -1,5 +1,4 @@
 """Module reference.py"""
-import pandas as pd
 import geopandas
 
 import src.elements.s3_parameters as s3p
